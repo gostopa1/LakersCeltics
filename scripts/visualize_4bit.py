@@ -159,7 +159,12 @@ def main():
     args = parser.parse_args()
 
     # Read data
-    nibbles = read_nibbles(args.file, args.offset, args.length)
+    length = int(args.rows * args.cols/2)
+    print(f"Number of bytes:{length}")
+    print(f"Number of nibbles:{length*2}")
+    print(f"Bytes: {args.offset} - {args.offset+length}")
+    #nibbles = read_nibbles(args.file, args.offset, args.length)
+    nibbles = read_nibbles(args.file, args.offset, length)
 
     # Validate size
     if len(nibbles) != args.rows * args.cols:
