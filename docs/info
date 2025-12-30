@@ -1,0 +1,172 @@
+tp0: Chicago Bulls
+tp1: Boston Celtics
+tp2: East All Stars
+tp3: Utah Jazz
+tp4: New York Nicks
+tp5: Los Angeles Lakers
+tp6: Detroit Pistons
+tp7: Seattle Supersonics
+tp8: Phoenix Suns
+tp9: West All-Stars
+
+- When copying the teams, the names are the same, the looks are the same, the titles and the logo are the same.
+- E.g. tp0 is Chicago Bulls, if you copy this to be also tp1, tp2, tp3, then they will all be Chicago bools
+- Useful info: When changing the team files while the game is running on the main screen, they are refreshed. This means, they are loaded dynamically, not pre-loaded in the beginning of the game.
+
+- Next question is, how similar are the teams binary files?
+- To begin with, all the files are of the same size. What does that mean in practice? First of all that, the length of the surnames does not really matter. They are either appended with spaces until the maximum length, or they are stored somehow somewhere else and the team file only contains a pointer.
+
+- Starting from byte 1000 replacing 1000 bytes from tp2 to tp1 and storting the result in tp0
+That makes Chicago Bulls to be Boston Celtics with some parts of East All-Stars! Part of the logo is Bulls, another part is East All Stars. Cummings is now playing instead of Bird. The rest of the players are the same in the starting 5. From the subs, Barkley and Daugherty are there instead of Acres and Birdsong. That means that the players are not in the order they appear. But "Barkley" is white in this case! So it has the looks of Acres but it shows Barkley?!
+
+- From bytes 800 to 1600 it changes the logo!?
+
+- From bytes 800 to 1800 it also changes the name but half way?
+If I put from 850 to 1850 the first name is changed fully from BIRD to CUMMINGS. The logo is not full though. It seems to start around 800-850
+
+
+#open ./dosbox-x.app --args -c "MOUNT C ~/DOSSTUFF/lakers-vs-celtics-and-the-nba-playoffs/nba/ & c:"
+open ./dosbox-x.app --args ~/DOSSTUFF/lakers-vs-celtics-and-the-nba-playoffs/nba/nba.exe
+open ./dosbox-x.app --args ~/DOSSTUFF/lakers-vs-celtics-and-the-nba-playoffs/nba/nba.exe
+
+Changing from 0 to 3000, all the names and figures have changed but not the stats!
+
+Changing from 0 2000 all the names match the other team but not the stats
+
+Until 5000 all the nanes are the same. The heights are random, e.g. the center claims to be 6.04 but he looks identical to the oponent
+
+Changing the first 2000 bytes from Boston to Lakers, shows Acres to be the center of LA instead of A-Jabbar. Is it in alphabetical order? He still looks like Jabbar. Still shooting like Jabbar
+
+Changing from 3000 for 2000 you get same looking players
+Setting from 3000 for 2000, you only get A-Jabbar, looking blond, with dark suits, scoring a lot  !?
+- Setting every byte to 255: From 0 to 5000 - All names A-Jabbar, all same hight, dark suits, blone, shootin like Jabbar, very good scoring, same shirt number
+When setting to 255 the files look like all zeros. Endianness?
+- Setting everything to 0 it crashes!
+
+
+
+- How to run the dosbox
+open /Users/tan/DosStuff/dosbox-x-macosx-arm64-20251007154914/dosbox-x/dosbox-x.app --args ~/DOSSTUFF/lakers-vs-celtics-and-the-nba-playoffs/nba/nba.exe
+
+
+Memory areas:
+0 - 800: The name of the team is changed. Doesn't seem to cause any visual difference in the teams, logo and players. The game plays fine.
+0 - 400: The upper part of the name
+400-800 Changes the name to Los Angeles Celtics. I.e. transfers only the lower part of the name
+826 - 1610: is the logo (784 bytes?) Setting 111111 makes it same as the background, 00000000 sets it black
+
+- Player names start 1608, for 132 bytes, they are in sequence, if you double the bytes, the names are affected but not the statistics! Nor the looks.
+- 6 pixels height, 22 pixels wide, 132 bytes per player.
+After this we end up to an offset of 3192. Interesting stuff starts happening there. It seems to be the pointers for the players, meaning, what player is chosen from some database somewhere.
+
+- Put a "00" starting there and you will get A Jabbar instead of Worthy.
+- 01 shows black info!?
+- 02
+- 03 is also weird?!
+
+- So it seems that every odd number is ... odd!? The last bit leads to shit? Could it be endianness??
+
+ - So changing the first byte from 16 to 17, Jabbar appears as worthy, shorter (?) and with slightly shifted t-shirt!?
+
+ - So indeed even if you try to write a byte as binary, as long as it contains a 1 in the end the name will be garbage. 
+And actually in the original data from Los Angeles lakers you see:
+3192 3204(b'\x16\x06\x00\x08\x10\x02\x04\n\x0c\x0e\x12\x14')
+No odd number.
+---
+It is the index of the players:
+Los Angeles lakers:
+Player index order:
+Worthy
+Green
+A. Jabbar
+Johnson
+Scott
+
+Campbell
+Cooper
+Lamp
+McNamara
+Rivers
+Thompson
+Woolridge
+
+Alphabeticlly? Who knows? (Yes, by surname)
+
+This is 
+- So what's after 3204? Let's find out
+
+The first 12 bytes are:
+(b'\x00\x01\x0e\x05\x04\x05\x00\x07\x08\t\x0e\x05')
+- Low values-
+- repetition
+- odd values as well as even
+
+This changes something that is not visualizes, he he heeeee, is it the stats?
+
+I set everything to ff. 
+I try a game, I scorre twice, 3 pointers from random positions with the super pocket sound!?!
+Then I missed some shots and the theory of having found the spot of performance faded out. 
+
+
+- Clearly the players are pointers, 5 bytes are enough
+
+- The head pixels are 1200 bytes. Starting where?
+
+
+Colors
+0: black
+1: dark blue (ultramarine, azure, royal blue)
+2: green (forest, kelly green)
+3: teal/aqua (tiffany blue, medium turquoise)
+4: red (blood red, ruby, crimson)
+5: purple (dark magenta, byzantium)
+6: brown (chocolate, copper, saddle brown)
+7: light gray (silver, neutral gray)
+8: dark gray (charcoal, ash)
+9: violet/blue (periwinkle blue)
+A: light green (mint, spring, pastel green)
+B: light blue (aquamarine, bright cyan)
+C: light red (light coral, salmon, pastel red)
+D: pink (fuchsia, orchid)
+E: yellow (lemon, canary, pastel yellow)
+F: white
+
+3988 - 3999 values 00 - 04?
+4000 - 4011 Heights (00, 01, 02)
+
+4012 - 5212 5 rows x 8 columns
+5272 - 5381 : Name 44x5 pixels in game board
+
+
+Questions:
+3204 - 3267 what there?
+
+
+Michalis:
+Bytes:
+0-827: Team name (92x18 px), 828 bytes
+828-1607: team logo (30x52 px), 780 bytes 
+1608-3191: Player names in team roster view (44x6 pixels, 132 bytes/player)
+3192-3203: Player positions (1 byte/player, weird way, see below)
+3204-3267: Player colors (not selected/selected: jersey, shorts, skin, shoes, socks, shadows)
+3268-3987: Name grids on jersey (First not selected, then selected, alphabetically)
+3988-3999: 
+4000-4011: Player height (1 byte/player from 00 to 02, see below)
+4012-5211: Player heads, alphabetically (8x5 pixels)
+5212-5271:  60 bytes 12x  "40" makes all black
+- even if I change the first 12 bytes everyone is black
+- first 12 bytes are 00 or 01, black or white. It doesn't seem to affect the teams but it is correct.
+5272-5381: Team name in game board (44x5 pixels, 110 bytes, bytes within game)
+
+
+- Where does it pick from subdat?
+
+5224 - 5259
+5260 - 5271
+
+python ./scripts/visualize_4bit.py tp1 --offset 0x1000 --length 64 --rows 16 --cols 8 --ascii
+
+python ./scripts/visualize_4bit.py tp1 --offset 0x1000 --length 128 --rows 32 --cols 8 --image block.png
+
+python ./scripts/visualize_4bit.py tp1 --offset 828 --length 800 --rows 50 --cols 32 --image block.png
+828-1607
