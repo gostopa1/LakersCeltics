@@ -1,0 +1,54 @@
+Perfect — this directory is the DOS installation folder for Lakers versus Celtics and the NBA Playoffs.
+Those short, extensionless filenames are a hallmark of EA Sports’ early EA-DOS engine, where each file stores one kind of data (rosters, options, commentary, sprites, etc.).
+
+Here’s what each file most likely does (based on known patterns in Lakers vs. Celtics, Jordan vs. Bird, and early NBA Live DOS versions).
+
+🏀 Core executable
+File	Likely purpose	Notes
+nba.exe	Main program executable	Contains the game logic, rendering engine, RNG, and code that reads the data files. This is the file you’d patch or analyze to find scoring formulas.
+🧠 Configuration and options
+File	Likely purpose	Notes
+optdat	Game options data	Stores menu selections (difficulty, quarter length, control type). Usually a small binary config saved between runs.
+opt	Options code or template	The “default” option set loaded when no optdat exists.
+tsav	Team save / season state	Very small (139 B), probably last used team or tournament progression.
+🕹 Gameplay / match data
+File	Likely purpose	Notes
+logdat	Log of recent games	Stores scores, highlights, or “last game” info for the replay screen.
+rep / repdat	Replay data	Contains recorded replays or highlight clips (frame-by-frame input logs).
+sub / subdat	Substitution patterns	Defines lineups, player rotations, and fatigue thresholds.
+smndat	Sound manager data	Holds pointers to sound/music effects.
+v / vic	Victory / ending sequences	“Victory” text, animation pointers, credits.
+📋 Rosters & teams
+File	Likely purpose	Notes
+lct	Lakers–Celtics Teams data	The big one for you — 51 KB, consistent with roster tables, player ratings, and team attributes. Probably stores all player names and stats.
+t	Team index	Smaller 2–3 KB file referencing tp0–tp9; likely a lookup table of team records (IDs → file names).
+tp0 → tp9	Team player files	Ten team roster files. Each ~5 KB → roughly one per team (5 KB ≈ 10 players × ~500 bytes). Inside you’ll likely find player names and stats.
+tre	Team references	4.8 KB — possibly a short index tying teams to graphics/colors/logos.
+ttl	Title data	Title screen text (team list, copyright strings, etc.).
+sel	Team selection screen data	Defines the team-selection graphics and color palettes.
+🖼 Graphics, animation & sound
+File	Likely purpose	Notes
+a / c / m / o / p / r / s / v	Graphics / sprites / fonts	Each small (2–25 KB). Early EA titles split art assets into tiny lumps:
+• a = arena graphics or audience
+• c = court (floor, colors)
+• m = menus
+• o = overlays
+• p = portraits or player sprites
+• r = referees / rim / scoreboard graphics
+• s = sound effect index or sprite sheet
+• v = victory animations (shared with vic).
+tre / ttl / sel	As above, selection/title screen assets.	
+🏁 What matters for your research (player probabilities)
+
+The roster data is almost certainly inside lct and/or tp0–tp9.
+These are the files you’ll want to inspect first with strings or xxd. You should find player names (like “MAGIC”, “BIRD”, “KAREEM”) inside one of them.
+
+A good order to check:
+
+strings lct | egrep -i "MAGIC|BIRD|KAREEM|JORDAN|LAKERS|CELTICS"
+strings tp0 | head
+
+
+If you see names, that file holds the player attribute tables we discussed earlier — meaning you can start locating ratings and, later, deduce the scoring probability weights from there.
+
+Would you like me to show the exact next commands to extract readable player names and locate the attribute tables inside lct or tp*? (I can tailor the command lines for macOS since your prompt shows “staff / tan”.)
